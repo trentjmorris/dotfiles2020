@@ -7,6 +7,8 @@ export VIM_TMP_DIR=$HOME/.vim_tmp
 
 source "$DOTFILES_DIR/echo"
 
+cd "$(dirname "$0")"
+
 
 
 
@@ -46,7 +48,9 @@ echo_done "Xcode"
 echo_exit "Xcode"
 
 
-
+echo "\n----------\n'echo_exit' DID NOT EXIT BEFORE THIS FIRED!!!!!!!!!\n----------\n"
+exit 1
+echo "\n----------\nEVEN A MANUAL 'exit 1' DID NOT EXIT BEFORE THIS FIRED!!!!!!!!!\n----------\n"
 
 #   ------------------------------------------------------
 #   GITCONFIG
@@ -54,7 +58,7 @@ echo_exit "Xcode"
 echo_start "Gitconfig"
 
 setup_gitconfig () {
-  if ! [ -f git/gitconfig.local.symlink ]
+  if ! [ -f '$DOTFILES_DIR/git/gitconfig.local.symlink' ]
   then
     echo_info 'setup gitconfig'
 
