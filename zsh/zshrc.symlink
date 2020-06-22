@@ -1,0 +1,79 @@
+#  Exports {{{
+export DOTFILES_DIR=$HOME/.dotfiles
+export LIB_DIR=$DOTFILES_DIR/lib
+export VIM_DIR=$HOME/.vim
+export VIM_TMP_DIR=$HOME/.vim_tmp
+export EDITOR='vim'
+export HISTIGNORE="ls:cd:cd -:pwd:exit:date:* --help"
+
+PATH=/usr/local/opt/python/libexec/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin
+export PATH
+
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=$VIM_TMP_DIR/.zsh_history
+#  }}}
+
+#  Completions {{{
+# initialize autocomplete here, otherwise functions won't be loaded
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+	compinit
+done
+compinit -C
+
+zstyle ':completion:*' menu select
+# matches case insensitive for lowercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+
+# git flow completions
+source $LIB_DIR/git-flow-completion/git-flow-completion.zsh
+# zsh autosuggestions
+source $LIB_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh
+# zsh completions
+fpath=($LIB_DIR/zsh-completions/src $fpath)
+#  }}}
+
+#  Prompt {{{
+# pure prompt
+autoload -U promptinit; promptinit
+prompt pure
+#  }}}
+
+#  Aliases {{{
+# all of our zsh files
+typeset -U config_files
+config_files=($ZSH/**/*.zsh)
+
+# load the path files
+for file in ${(M)config_files:#*/path.zsh}
+do
+  source $file
+done
+
+unset config_files
+#  }}}
+
+#  Plugins/Libraries {{{
+# https://github.com/mroth/scmpuff
+eval "$(scmpuff init -s --aliases=false)"
+# alias tips
+source $LIB_DIR/alias-tips/alias-tips.plugin.zsh
+# zsh-z (zsh optimized `z` alternative)
+source $LIB_DIR/z/zsh-z.plugin.zsh
+# syntax highlighting
+source $LIB_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#  }}}
+
+#  Housecleaning {{{
+for file in $HOME/.bash_history $HOME/.bash_sessions $HOME/.hgignore_global $HOME/.subversion $HOME/.zsh_history $HOME/.gitflow_export
+do
+  if [ -e "$file" ]; then
+    rm -rf "$file" 2> /dev/null
+  fi
+done
+#  }}}
+
+# vim:foldmethod=marker:foldlevel=0:set nowrap:set nolinebreak

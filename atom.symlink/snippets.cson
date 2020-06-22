@@ -1,0 +1,106 @@
+# Your snippets
+#
+# Atom snippets allow you to enter a simple prefix in the editor and hit tab to
+# expand the prefix into a larger code block with templated values.
+#
+# You can create a new snippet in this file by typing "snip" and then hitting
+# tab.
+#
+# An example CoffeeScript snippet to expand log to console.log:
+#
+# '.source.coffee':
+#   'Console log':
+#     'prefix': 'log'
+#     'body': 'console.log $1'
+#
+# Each scope (e.g. '.source.coffee' above) can only be declared once.
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it in the
+# Atom Flight Manual:
+# http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
+
+# dotfiles, shell
+'.source.sh, .source.dotfiles, .source.shell':
+	'Title mark':
+		'prefix': 'h1'
+		'body': """
+		#   ------------------------------------------------------
+		#   ${1: Title}
+		#   ------------------------------------------------------
+		"""
+	'Subtitle mark':
+		'prefix': 'h2'
+		'body': """
+		#   ${1: Subtitle}
+		#   --------------------------------------
+		"""
+	'Heading mark':
+		'prefix': 'h3'
+		'body': """
+		#   -- ${1: Heading} --
+		"""
+	'Silence Output':
+		'prefix': 'null'
+		'body': "> /dev/null 2>&1"
+# swift, javascript, pug, jade
+'.source.swift, .source.js, .source.pug, .source.jade':
+	'Title mark':
+		'prefix': 'h1'
+		'body': """
+		//   ------------------------------------------------------
+		//   ${1: Title}
+		//   ------------------------------------------------------
+		"""
+	'Subtitle mark':
+		'prefix': 'h2'
+		'body': """
+		//   ${1: Subtitle}
+		//   --------------------------------------
+		"""
+	'Heading mark':
+		'prefix': 'h3'
+		'body': """
+		//   -- ${1: Heading} --
+		"""
+
+# vimscript
+".source.viml":
+	'Title mark':
+		'prefix': 'h1'
+		'body': """
+		"   ------------------------------------------------------
+		"   ${1: Title}
+		"   ------------------------------------------------------
+		"""
+	'Subtitle mark':
+		'prefix': 'h2'
+		'body': """
+		"   ${1: Subtitle}
+		"   --------------------------------------
+		"""
+	'Heading mark':
+		'prefix': 'h3'
+		'body': """
+		"   -- ${1: Heading} --
+		"""
+
+'.source.html':
+	'Title mark':
+		'prefix': 'h1'
+		'body': """
+		<!--   ------------------------------------------------------
+		----   ${1: Title}
+		----   ----------------------------------------------------->
+		"""
+	'Subtitle mark':
+		'prefix': 'h2'
+		'body': """
+		<!--   ${1: Subtitle}
+		----   ------------------------------------->
+		"""
+	'Heading mark':
+		'prefix': 'h3'
+		'body': """
+		<!--   ${1: Heading}   -->
+		"""

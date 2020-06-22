@@ -1,0 +1,32 @@
+*-chrome-mac.zip
+third_party/WebKit/Source/devtools/front_end/audits2/lighthouse/renderer/logger.js
+third_party/WebKit/Source/devtools/front_end/audits2/lighthouse/renderer/report-ui-features.js
+
+# vim working files
+.netrwhist
+*.swp
+
+# no thx
+/node_modules
+/vendor
+/brew_components
+
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+._*
+Thumbs.db
+
+# Files that might appear on external disks
+.Spotlight-V100
+.Trashes
+
+# Compiled Python files
+*.pyc
+
+# random
+shilocation
+.idea
+!.gitkeep

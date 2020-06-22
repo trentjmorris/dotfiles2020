@@ -1,0 +1,16 @@
+# vim
+/vim.symlink/*
+!/vim.symlink/config
+!/vim.symlink/ftplugin
+!/vim.symlink/vimrc.symlink
+
+# libraries
+/lib/*
+
+# git credential file
+git/gitconfig.local.symlink
+
+# karabiner
+/karabiner/*
+!/karabiner/karabiner.json
+!/karabiner/assets

@@ -1,0 +1,6 @@
+pdfnameall() {
+	for file in $PWD/*
+	do
+		pdfname "$(basename "$file")"
+	done
+}

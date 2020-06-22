@@ -1,0 +1,29 @@
+#	Rename file with supplied prefix followed by timestamp & uuid string
+#
+#	arg 1: file
+#	arg 2: label
+#
+#	ex:	pdfname 082619.pdf debt
+#	=>	debt-2019_08_26_E89ECDRL
+#
+pdfname() {
+	fullfilename=$(basename $1)
+	formatted_date_matches=$(print $fullfilename | grep -o '\d\d\d\d_\d\d_\d\d' | wc -l)
+	if [ $formatted_date_matches -eq 0 ]; then
+		filename="${fullfilename%.*}"
+		extension="${fullfilename##*.}"
+		filedate=$(print $filename | grep -o '\d\d\d\d\d\d')
+
+		label=
+		suffixlabel=
+		prefixlabel=
+		if [ $2 ]; then label="$2_"; fi
+		suffixlabel=$(print $filename | grep -o '\-\D\+$')
+		prefixlabel=$(print $filename | grep -o '^\D\+-')
+		uuid=$(uuidgen | awk '{print substr($0,0,8)}')
+		datestamp=$(date -j -f '%m%e%y' $filedate +'%Y_%m_%d_')
+		mv -v $1 "$label$prefixlabel$datestamp$uuid$suffixlabel.$extension"
+	else
+		echo "File $(basename $1) already named"
+	fi
+}

@@ -1,0 +1,142 @@
+
+[include]
+  path = ~/.gitconfig.local	# use separate file for username / github token / etc
+
+[alias]
+	tags = "tag -l"						# Show verbose output about tags
+	branches = "branch -a"		# Show verbose output about branches
+	remotes = "remote -v"			# Show verbose output about remotes
+	aliases = "config --get-regexp alias"		# list gitconfig aliases
+	# Remove branches that have already been merged with master (a.k.a. ‘delete merged’)
+	dm = "!branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+	# Switch to a branch, creating it if necessary
+	go = "!f() { checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+	# Interactive rebase with the given number of latest commits
+	reb = "!r() { rebase -i HEAD~$1; }; r"
+
+[core]
+  # Use custom `.gitignore` and `.gitattributes`
+	excludesfile = ~/.gitignore_global
+	attributesfile = ~/.gitattributes
+
+  # Treat spaces before tabs and all kinds of trailing whitespace as an error
+  # [default] trailing-space: looks for spaces at the end of a line
+  # [default] space-before-tab: looks for spaces before tabs at the beginning of a line
+  whitespace = space-before-tab,-indent-with-non-tab,trailing-space
+
+  # Make `git rebase` safer on macOS
+  # More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
+  trustctime = false
+
+  # Prevent showing files whose names contain non-ASCII symbols as unversioned.
+  # http://michael-kuehnel.de/git/2014/11/21/git-mac-osx-and-german-umlaute.html
+  precomposeunicode = false
+
+  # Speed up commands involving untracked files such as `git status`.
+  # https://git-scm.com/docs/git-update-index#_untracked_cache
+  untrackedCache = true
+
+#   Color
+#   --------------------------------------
+
+[color]
+  ui = auto
+
+[color "diff"]
+	meta = yellow bold
+	commit = green bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+  newMoved = cyan
+  oldMoved = blue
+
+[color "diff-highlight"]
+	oldNormal = "red bold"
+	oldHighlight = "red bold 52"
+	newNormal = "green bold"
+	newHighlight = "green bold 22"
+
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+
+#   Git Actions
+#   --------------------------------------
+
+[commit]
+	template = ~/.gitmessage
+
+[push]
+  default = current # http://stackoverflow.com/a/23918418/89484
+  followTags = true
+
+#   Merge
+#   --------------------------------------
+
+[merge]
+	log = true # Include summaries of merged commits in merge commit messages
+	tool = opendiff
+	renameLimit = 0
+
+[mergetool]
+  keepBackup = false
+
+#   Diff
+#   --------------------------------------
+
+[diff]
+	tool = opendiff
+	renames = copies # Detect copies as well as renames
+	renameLimit = 9999
+
+[difftool]
+  prompt = false
+
+#   Git-flow
+#   --------------------------------------
+
+[gitflow "prefix"]
+  feature = feature-
+  release = release-
+  hotfix = hotfix-
+  support = support-
+  versiontag = v
+
+[gitflow "feature.finish"]
+	no-ff = true
+
+#   URL Shorthands
+#   --------------------------------------
+
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  pushInsteadOf = "github:"
+  pushInsteadOf = "git://github.com/"
+
+[url "git://github.com/"]
+  insteadOf = "github:"
+
+#   Other
+#   --------------------------------------
+
+[help]
+  autocorrect = 1
+
+# Sourcetree
+# ----------------------------------------
+
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path =
+
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true

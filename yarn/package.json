@@ -1,0 +1,17 @@
+{
+  "name": "trent_home",
+  "version": "1.0.0",
+  "description": "Trent's home directory",
+  "main": "index.js",
+  "author": "Trent Morris",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "prettier": "^1.18.2",
+    "stylelint": "^10.1.0",
+    "stylelint-config-recommended": "^2.2.0"
+  }
+}

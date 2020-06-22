@@ -1,0 +1,38 @@
+# This file contains snippets that are always defined. I personally
+# have snippets for signatures and often needed texts
+
+# sligthly lower priority than everything else since specialized versions
+# should overwrite. The user needs to adjust her priority in her snippets to
+# ~-55 so that other filetypes will still overwrite.
+priority -55
+
+global !p
+from vimsnippets import foldmarker, make_box, get_comment_format
+endglobal
+
+# Heading comment block
+snippet todo "TODO reminder" b
+get_comment_format[0] TODO(`echo $USER`): ${1:desc} `!v strftime("%c")`
+endsnippet
+
+# fold start
+snippet fold "Insert a vim fold marker" b
+`!p snip.rv = get_comment_format()[0]` ${1:Fold description} `!p snip.rv = foldmarker()[0]`
+endsnippet
+
+# fold end
+snippet foldc "Insert a vim fold close marker" b
+`!p snip.rv = get_comment_format()[0]` `!p snip.rv = foldmarker()[1]`
+endsnippet
+
+# fold start & end
+snippet foldp "Insert a vim fold marker pair" b
+`!p snip.rv = get_comment_format()[0]` ${1:Fold description} `!p snip.rv = foldmarker()[0]`
+${2:${VISUAL:Content}}
+`!p snip.rv = get_comment_format()[0]` `!p snip.rv = foldmarker()[1]`
+endsnippet
+
+# silence command output
+snippet devnull "Redirect STDOUT & STDERR" 
+> /dev/null 2>&1
+endsnippet

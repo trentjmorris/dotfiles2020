@@ -1,0 +1,65 @@
+"*":
+  "autocomplete-plus":
+    confirmCompletion: "enter"
+    enableAutoActivation: false
+    scopeBlacklist: [
+      ".source.pug"
+    ]
+  core:
+    closeDeletedFileTabs: true
+    closeEmptyWindows: false
+    disabledPackages: [
+      "package-generator"
+      "dev-live-reload"
+      "styleguide"
+      "spell-check"
+      "deprecation-cop"
+      "open-on-github"
+      "image-view"
+      "about"
+      "metrics"
+      "atom-bootstrap3"
+    ]
+    projectHome: "/Users/trent/Code"
+    telemetryConsent: "no"
+    themes: [
+      "dracula-ui"
+      "dracula-syntax"
+    ]
+  disabledPackages: [
+    "background-tips"
+    "exception-reporting"
+    "metrics"
+    "react"
+    "linter-rubocop"
+    "tree-view"
+  ]
+  editor:
+    fontFamily: "Menlo"
+    fontSize: 13
+    invisibles:
+      tab: " "
+    scrollPastEnd: true
+    showIndentGuide: true
+    softTabs: false
+    softWrap: true
+    tabType: "hard"
+  "exception-reporting":
+    userId: "81a52862-ee61-461f-96e5-3a54d62dbdab"
+  welcome:
+    showOnStartup: false
+  whitespace:
+    ignoreWhitespaceOnCurrentLine: false
+".pug.source":
+  whitespace:
+    removeTrailingWhitespace: true
+".source.viml":
+  "bracket-matcher":
+    autocompleteCharacters: [
+      "()"
+      "[]"
+      "{}"
+      "<>"
+      "``"
+      "''"
+    ]

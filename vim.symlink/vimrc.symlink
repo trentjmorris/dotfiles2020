@@ -1,0 +1,429 @@
+
+""" Plugins
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+  " Automatic vim-plug installation
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+" Themes {{{
+Plug 'joshdick/onedark.vim'
+
+Plug 'dracula/vim', { 'as': 'dracula' }
+
+Plug 'jacoborus/tender.vim'
+
+Plug 'cocopon/iceberg.vim'
+
+Plug 'ayu-theme/ayu-vim'
+let ayucolor='mirage'
+
+Plug 'arcticicestudio/nord-vim'
+" }}}
+
+" Airline {{{
+Plug 'vim-airline/vim-airline'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#ale#enabled = 1
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+" or copy paste the following into your vimrc for shortform text
+let g:airline_mode_map = {
+   \ '__'     : '-',
+   \ 'c'      : 'COMMAND',
+   \ 'i'      : 'INSERT',
+   \ 'ic'     : 'INSERT',
+   \ 'ix'     : 'INSERT',
+   \ 'n'      : 'NORMAL',
+   \ 'multi'  : 'MULTI',
+   \ 'ni'     : 'NORMAL',
+   \ 'no'     : 'NORMAL',
+   \ 'R'      : 'R',
+   \ 'Rv'     : 'R',
+   \ 's'      : 'SELECT',
+   \ 'S'      : 'SELECT',
+   \ ''     : 'SELECT',
+   \ 't'      : 'TERMINAL',
+   \ 'v'      : 'VISUAL',
+   \ 'V'      : 'VISUAL',
+   \ ''     : 'VISUAL',
+   \ }
+let g:airline_symbols.branch=''
+let g:airline_symbols.notexists='[?]'
+let g:airline_symbols.dirty='[*]'
+
+let g:airline_section_z="%#__accent_bold#%4l%#__restore__#/%L%  "
+" let g:airline_section_z="%3p%% %#__accent_bold#%{g:airline_symbols.linenr}%4l%#__restore__#%#__accent_bold#/%L%{g:airline_symbols.maxlinenr}%#__restore__# :%3v"
+" control which sections get truncated and at what width
+let g:airline#extensions#default#section_truncate_width = {
+      \ 'b': 79,
+      \ 'x': 60,
+      \ 'y': 88,
+      \ 'z': 45,
+      \ 'warning': 80,
+      \ 'error': 80,
+      \ }
+let g:airline#extensions#tabline#formatter = 'default'
+" }}}
+
+" ALE {{{
+Plug 'dense-analysis/ale'
+" navigate between ALE errors
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+inoremap <silent> <C-Space> <C-\><C-O>:ALEComplete<CR>
+let g:ale_completion_enabled = 1
+let g:ale_sign_column_always = 1
+let g:ale_linters_explicit = 1
+let g:ale_fixers = {
+         \ 'javascript': ['eslint'],
+         \ 'swift': ['swiftformat'],
+         \ 'css': ['prettier', 'stylelint'],
+         \ 'markdown': ['prettier'],
+         \ 'json': ['prettier']
+         \ }
+let g:ale_linters = {
+         \ 'javascript': ['eslint'],
+         \ 'swift': ['swiftlint'],
+         \ 'css': ['stylelint'],
+         \ 'markdown': ['write-good'],
+         \ 'text': ['write-good']
+         \ }
+let g:ale_fix_on_save = 1
+" }}}
+
+" Auto Pairs {{{
+Plug 'jiangmiao/auto-pairs'
+inoremap <M-j> <nop>
+let g:AutoPairs = {'(':')', '{':'}', '[':']'}
+let g:AutoPairsShortcutFastWrap = '<M-j>'
+" }}}
+
+" Commentary {{{
+Plug 'tpope/vim-commentary'
+" }}}
+
+" CtrlP {{{
+Plug 'ctrlpvim/ctrlp.vim'
+nnoremap <leader>p :CtrlP<CR>
+nnoremap <leader>m :CtrlPMRU<CR>
+let g:ctrlp_match_window = 'bottom,order:ttb'
+let g:ctrlp_switch_buffer = 0
+let g:ctrlp_working_path_mode = 0
+let g:ctrlp_show_hidden=1
+let g:ctrlp_cache_dir='~/.vim_tmp/cache/ctrlp'
+" }}}
+
+" Fugitive {{{
+Plug 'tpope/vim-fugitive'
+" }}}
+
+" Languages {{{
+Plug 'sheerun/vim-polyglot'
+Plug 'keith/swift.vim'
+Plug 'moll/vim-node'
+" }}}
+
+" Multiple Cursors {{{
+Plug 'terryma/vim-multiple-cursors'
+" }}}
+
+" NERD Tree {{{
+Plug 'scrooloose/nerdtree'
+set conceallevel=3
+map <C-n> :NERDTreeToggle<CR>
+let g:NERDTreeShowHidden=1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+let g:NERDTreeIgnore=['^.DS_Store$', '^.git$']
+" NERDTree Git {{{
+Plug 'Xuyuanp/nerdtree-git-plugin'
+let g:NERDTreeIndicatorMapCustom = {
+         \ "Modified"  : " \ufbc2 ",
+         \ "Staged"    : "✚",
+         \ "Untracked" : "✭",
+         \ "Renamed"   : "➜",
+         \ "Unmerged"  : "═",
+         \ "Deleted"   : "✖",
+         \ "Dirty"     : "✗",
+         \ "Clean"     : "✔︎",
+         \ 'Ignored'   : '☒',
+         \ "Unknown"   : "?"
+         \ }
+" }}}
+" }}}
+
+" NERD Commenter {{{
+Plug 'scrooloose/nerdcommenter'
+let g:NERDCommentEmptyLines = 1
+let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
+let g:NERDCompactSexyComs = 1 " Use compact syntax for prettified multi-line comments
+let g:NERDDefaultAlign = 'left' " Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDAltDelims_swift = 1 " Set a language to use its alternate delimiters by default
+let g:NERDTrimTrailingWhitespace = 1 " trim trailing whitespace when uncommenting
+let g:NERDToggleCheckAllLines = 1 " check if selected lines are commented
+" }}}
+
+" Repeat {{{
+Plug 'tpope/vim-repeat'
+" }}}
+
+" Surround {{{
+Plug 'tpope/vim-surround'
+" }}}
+
+" UltiSnips {{{
+Plug 'honza/vim-snippets'
+Plug 'SirVer/ultisnips'
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsSnippetsDir = $HOME."/.vim/config/UltiSnips"
+let g:UltiSnipsSnippetDirectories=[$HOME."/.vim/config/UltiSnips"]
+" }}}
+
+" Undo Tree {{{
+Plug 'mbbill/undotree'
+nnoremap <leader>u :UndotreeToggle<CR>
+" }}}
+
+call plug#end()
+
+
+
+" Base Config {{{
+
+set cursorline          " highlight current line
+set display=lastline,uhex " invisible character displayed in hex format
+set guifont=Sauce\ Code\ Pro\ Nerd\ Font\ Complete:h14
+set laststatus=2
+set lazyredraw          " redraw only when we need to.
+set lines=54            " number of lines for new windows
+set noeb vb t_vb=       " disable error beep and flash
+set noerrorbells          " Don't beep
+set number              " show line numbers
+set showcmd             " show command in bottom bar (unnecessary with airline)
+set showmatch           " highlight matching [{()}]
+set splitright					" files open in the right window when :vsp
+set termguicolors       " enable true colors support
+set visualbell          " Don't beep
+set wildmenu            " visual autocomplete for command menu
+set wildmode=full
+syntax enable
+syntax on
+colorscheme dracula
+if argc() == 2
+   silent vertical all
+endif
+
+silent !mkdir ~/.vim/tmp > /dev/null 2>&1
+set autoread            " Allow read files that changes outside vim
+set backspace=indent,eol,start  " allow backspacing over everything in insert mode
+set nobackup            " no backup files
+set noswapfile          " no swap files
+set encoding=utf-8      " Set the encoding that is showing in the terminal
+set fileencoding=utf-8  " Set the encoding of the file that is written
+"set hidden              " open files without saving the current file
+set undodir=~/.vim/tmp//
+set undofile
+set updatetime=1000
+set viminfo='50,<1000,s100,:0,n~/.vim/tmp/viminfo
+let g:netrw_home='~/.vim/tmp'
+
+set autoindent          " always set autoindenting on
+set breakindent         " Indents wrapped lines as much as the 'parent' line
+set breakindentopt=sbr  " Display the 'showbreak' value before applying the addtl indent.
+set showbreak=↪>\       " I use a unicode curly array with a <backslash><space>
+set copyindent          " copy the previous indentation on autoindenting
+set expandtab           " Use spaces
+set formatoptions=l     " Ensures word-wrap does not split words
+set lbr                 " Ensures word-wrap does not split words
+set linebreak           " Wrap at 'breakat' instead of the last character
+set modelines=1         " use file specific modeline settings instead of Tabs
+set wrap              " Don't Wrap the text (windows size)
+set shiftround          " use multiple of shiftwidth when indenting with '<' and '>'
+set shiftwidth=3        " affects >>, << or == & auto indentation
+set softtabstop=3       " number of spaces in tab when editing
+set tabstop=3           " number of visual spaces per TAB
+filetype indent on      " load filetype-specific indent files
+
+set grepprg='ag'           " Use the silver searcher instead of grep
+set hlsearch            " highlight matches
+set ignorecase					" ignore case when searching
+set incsearch           " search as characters are entered
+nnoremap <leader><space> :nohlsearch<CR>  " clear search highlights
+
+" }}}
+
+
+" Mappings {{{
+""" Basic
+nmap <Space> za
+vmap <Space> za
+set foldenable
+set foldlevelstart=0
+set foldmethod=marker
+highlight Folded gui=NONE guifg=#999fa9 guibg=#252a31
+function! NeatFoldText()
+  let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+  let lines_count = v:foldend - v:foldstart + 1
+  let lines_count_text = '| ' . printf("%10s", lines_count . ' lines') . ' |'
+  let foldchar = matchstr(&fillchars, 'fold:\zs.')
+  let foldtextstart = strpart('+' . repeat(foldchar, v:foldlevel*2) . line, 0, (winwidth(0)*2)/3)
+  let foldtextend = lines_count_text . repeat(foldchar, 8)
+  let foldtextlength = strlen(substitute(foldtextstart . foldtextend, '.', 'x', 'g')) + &foldcolumn
+  return foldtextstart . repeat(foldchar, winwidth(0)-foldtextlength) . foldtextend
+endfunction
+set foldtext=NeatFoldText()
+let mapleader=','
+" jump to start of line in insert mode
+inoremap <leader>i <C-o>I
+" jump to end of line in insert mode
+inoremap <leader>a <C-o>A
+" edit .vimrc
+nnoremap <leader>ev :vsp ~/.vimrc<CR>
+" edit .zshrc
+nnoremap <leader>ez :vsp ~/.zshrc<CR>
+" source .vimrc
+nnoremap <leader>sv :source ~/.vimrc<CR>
+" manage sessions
+let g:session_dir='~/.vim/tmp/sessions'
+nnoremap <Leader>ss :mks! ' . g:session_dir . '/*.vim<C-D><Left><Left><Left><Left><BS>
+nnoremap <Leader>sr :so ' . g:session_dir . '/*.vim<C-D><BS><BS><BS><BS><BS>
+" map: move line up/down
+nnoremap <S-Down> :m+<CR>==
+nnoremap <S-Up> :m-2<CR>==
+inoremap <S-Down> <Esc>:m+<CR>==gi
+inoremap <S-Up> <Esc>:m-2<CR>==gi
+vnoremap <S-Down> :m '>+1<CR>gv=gv
+vnoremap <S-Up> :m '<-2<CR>gv=gv
+" map: move vertically by visual line
+nnoremap j gj
+nnoremap <Down> gj
+nnoremap k gk
+nnoremap <Up> gk
+" move to beginning/end of line
+nnoremap B ^
+nnoremap E $
+" $/^ doesn't do anything, use above mappings instead
+nnoremap $ <nop>
+nnoremap ^ <nop>
+" highlight last inserted text
+nnoremap gV `[v`]
+" safe current buffer when hitting <esc> twice
+map <Esc><Esc> :w<CR>
+" Control-S always saves the file, and, if called from visual mode, restores the visual selection when done. It does not re-enter insert mode, though, so I use it as my quit-insert-mode-and-save macro.
+" https://vim.fandom.com/wiki/Saving_a_file
+nmap <c-s> :w<CR>
+vmap <c-s> <Esc><c-s>gv
+imap <c-s> <Esc><c-s>
+" jk is escape
+inoremap jk <esc>
+" matches the behavior of C and D, buy copying to end of the line
+nnoremap Y y$
+" previous tab
+nnoremap <silent><A-LEFT> :call TabJump('left')<CR>
+" next tab
+nnoremap <silent><A-RIGHT> :call TabJump('right')<CR>
+" new tab
+nnoremap <A-UP> :tabnew<CR>
+" close tab
+nnoremap <A-DOWN> :tabclose<CR>
+" Buffer navigation
+nnoremap ]b :bnext<cr>
+nnoremap [b :bprev<cr>
+" Buffer delete
+nnoremap <leader>d :bd<cr>
+" Format the entire file
+nnoremap <leader>fef :normal! gg=G``<CR>
+
+""" NERDCommenter
+"nunmap ,ca
+nnoremap <silent> <leader>ca :call NERDComment("n", "Append")<CR>
+" }}}
+
+
+" Functions {{{
+
+"Tab
+function! TabJump(direction)
+    let l:tablen=tabpagenr('$')
+    let l:tabcur=tabpagenr()
+    if a:direction=='left'
+        if l:tabcur>1
+            execute 'tabprevious'
+        endif
+    else
+        if l:tabcur!=l:tablen
+            execute 'tabnext'
+        endif
+    endif
+endfunction
+
+function! TabMove(direction)
+    let l:tablen=tabpagenr('$')
+    let l:tabcur=tabpagenr()
+    if a:direction=='left'
+        if l:tabcur>1
+            execute 'tabmove' l:tabcur-2
+        endif
+    else
+        if l:tabcur!=l:tablen
+            execute 'tabmove' l:tabcur
+        endif
+    endif
+endfunction
+
+" strips trailing whitespace at the end of files. Called in 'AutoGroups' fold.
+function! <SID>StripTrailingWhitespaces()
+  " save last search & cursor position
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  %s/\s\+$//e
+  let @/=_s
+  call cursor(l, c)
+endfunction
+" Create a file's non-existing parent directories on save. Called in 'AutoGroups' fold.
+" https://stackoverflow.com/a/4294176/7764481
+function s:MkNonExDir(file, buf)
+  if empty(getbufvar(a:buf, '&buftype')) && a:file!~#'\v^\w+\:\/'
+    let dir=fnamemodify(a:file, ':h')
+    if !isdirectory(dir)
+      call mkdir(dir, 'p')
+    endif
+  endif
+endfunction
+
+" }}}
+
+
+" Autocommands {{{
+
+augroup configgroup
+  autocmd!
+  " create intermediate directories when writing to a dir that doesn't exist
+  autocmd BufWritePre * :call s:MkNonExDir(expand('<afile>'), +expand('<abuf>'))
+  " Strip trailing spaces on write
+  autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
+  " clear error signs/marks
+  autocmd VimEnter * highlight clear SignColumn
+  """ Format Options ----------------------------------------
+  " c: wrap comments using text width
+  " r: insert comment leader after hitting Enter in Insert mode
+  " q: allow formatting with 'gq'
+  " l: long lines are not broken in insert mode
+  " j: where it makes sense, remove comment leader when joining lines
+  " p: don't break lines at single spaces that follow periods
+  autocmd BufEnter * setlocal fo=crqljp
+augroup END
+
+" }}}
+
+
+" vim:foldmethod=marker:foldlevel=0

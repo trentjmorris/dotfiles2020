@@ -1,0 +1,24 @@
+priority -50
+
+global !p
+from vimsnippets import foldmarker, make_box, get_comment_format
+endglobal
+
+# fold start
+snippet fold "Insert a vim fold marker" b
+// ${1:Fold description} `!p snip.rv = foldmarker()[0]`
+endsnippet
+
+# fold end
+snippet foldc "Insert a vim fold close marker" b
+// `!p snip.rv = foldmarker()[1]`
+endsnippet
+
+# fold start & end
+snippet foldp "Insert a vim fold marker pair" b
+// ${1:Fold description} `!p snip.rv = foldmarker()[0]`
+${2:${VISUAL:Content}}
+// `!p snip.rv = foldmarker()[1]`
+endsnippet
+
+

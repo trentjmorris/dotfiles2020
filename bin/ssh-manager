@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+BIN_NAME=$(basename "$0")
+COMMAND_NAME=$1
+ARROW="￫"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+if [[ ! $COMMAND_NAME ]] || [[ $COMMAND_NAME = "help" ]] || [[ $COMMAND_NAME = "-h" ]] || [[ $COMMAND_NAME = "--help" ]]; then
+	echo -e "$ARROW Usage: ${YELLOW}$BIN_NAME <command>${NC}"
+    echo
+    echo "Commands:"
+    echo "   help             This help message"
+    echo "   list             List of all SSH keys"
+    echo "   copy             Copy public SSH key"
+    echo "   new              Generate new SSH key"
+    echo "   remove           Remove host from SSH config"
+fi
+
+if [[ $COMMAND_NAME = "list" ]]; then
+	echo -e "${YELLOW}$ARROW List of available keys:${NC}"
+
+	for file in ~/.ssh/*.pub
+	do
+    echo "- "${file##*/}
+	done
+fi
+
+if [[ $COMMAND_NAME = "copy" ]]; then
+	folder=$HOME"/.ssh/"
+	key=$2
+
+	if [[ ! "$key" ]]; then
+		echo -e "${RED}$ARROW Error: You have to pass key name. Usage: $BIN_NAME copy <name>${NC}"
+	else
+		key="id_rsa_"$key".pub"
+
+		if [[ ! -f $folder$key ]]; then
+      echo -e "${RED}$ARROW Error: Key $key does not exists in $folder.${NC}"
+	  else
+			cat $folder$key | pbcopy && echo -e "${GREEN}$ARROW Success: Your public SSH key $key was successfully copied to the clipboard.${NC}"
+	  fi
+	fi
+fi
+
+if [[ $COMMAND_NAME = "new" ]]; then
+	while true; do
+		read -p "$(echo -e "${YELLOW}$ARROW Enter key file name:${NC} ")" key
+
+		if [[ -f $HOME"/.ssh/id_rsa_"$key ]]; then
+      echo -e "${RED}$ARROW Error: Key with this file name ($key) already exists.${NC}"
+		else
+			break
+		fi
+	done
+
+	read -p "$(echo -e "${YELLOW}$ARROW Enter key comment:${NC} ")" comment
+
+	ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa_$key -C "$comment"
+  echo -e "${GREEN}$ARROW Success: SSH key '$key' was successfully created with comment '$comment'.${NC}"
+  
+  # add config file entry (if none exists)
+  config="~/.ssh/config"
+  if [[ ! -f $config ]]; then
+    # file does NOT exist
+    touch $config
+    echo -e "${GREEN}$ARROW File '$config' created.${NC}"
+  fi
+
+  # check for host * entry
+  if cat $config | grep -q "Host *"; then
+    # Host * line exists
+   if ! cat $config | grep -q "IdentityFile ~/.ssh/id_rsa_$key"; then
+     # list key as an identity
+    echo "\tIdentityFile ~/.ssh/id_rsa_$key" >> $config
+    echo -e "${GREEN}$ARROW Listed '$key' as an identity in $config..${NC}"
+   else
+    echo -e "${GREEN}$ARROW Config file was already setup to use key '$key' and use keychain.${NC}"
+   fi
+  else
+    # insert entire Hosts * entry, replacing any existing lines
+    echo "Host *\n\tAddKeysToAgent yes\n\tUseKeychain yes\n\tIdentityFile ~/.ssh/id_rsa_$key" > $config
+    echo -e "${GREEN}$ARROW Setup ssh config file to use key '$key' and use use keychain.${NC}"
+  fi 
+
+  # save to ssh-agent
+  eval "$(ssh-agent -s)"
+  ssh-add -K ~/.ssh/id_rsa_$key
+  echo -e "${GREEN}$ARROW SSH key '$key' was saved to the keychain via ssh-agent.${NC}"
+
+
+fi
+
+
+if [[ $COMMAND_NAME = "delete" ]]; then
+	folder=$HOME"/.ssh"
+	key=$2
+
+	if [[ ! "$key" ]]; then
+		echo -e "${RED}$ARROW Error: You have to pass key name. Usage: $BIN_NAME delete <name>${NC}"
+	else
+    fullpath_pub="$folder/id_rsa_$key.pub"
+    fullpath="$folder/id_rsa_$key"
+
+		if [[ ! -f $fullpath ]]; then
+      echo -e "${RED}$ARROW Error: Key $key does not exists in $folder.${NC}"
+	  else
+      read -p "$(echo -e "${YELLOW}$ARROW Are you absolutely sure you wish to delete the key: '$key'? Both the public and private keys will be removed. This cannot be undone! [D]elete [A]bort")" response
+
+      if [[ $response == "D"  ]]; then
+        rm -fv $fullpath_pub
+        rm -fv $fullpath
+	      echo -e "${GREEN}$ARROW Key pair '$key' was deleted${NC}"
+      else
+        echo -e "Command aborted. Key was not deleted."
+      fi
+	  fi
+	fi
+fi
+

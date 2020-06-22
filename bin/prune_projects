@@ -1,0 +1,11 @@
+#		Move/Prune project folders that haven't been modified in XX days
+#		 to the Projects (Archived) folder
+prune_projects() {
+	DAYS_TO_PRUNE=5
+	print "Files not modified for over $DAYS_TO_PRUNE days:"
+	for file in $(find ~/Projects -mtime "+$DAYS_TO_PRUNE")
+	do
+		print "\t$file"
+		#mv -v "$file" "~/Projects (Archived)"
+	done
+}

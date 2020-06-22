@@ -1,0 +1,19 @@
+#		Backup Documents to USB drive
+#		------------------------------------------------------
+function backup_docs() {
+	if [ -e /Volumes/SANDISK64A ]; then
+	# Use rsync to keep both folders synced
+	# 	-a	syncs recursively and preserved symbolic links, device files,
+	# 			modification times, group, owner, and permissions
+	# 	-P	progress bar & allows resuming interrupted transfers
+	# 	--delete	by default rsync does not delete any files, however to
+	# 						keep the folders truly in sync, deleted files should
+	# 						be removed from the backup directory as well.
+	#
+	# 	** note: trailing slash "/" is required following the first argument
+	# 	to denote syncing of the file contents **
+		rsync -aP --delete ~/Documents /Volumes/SANDISK64A
+	else
+		fail "SANDISK64A is not mounted. Connect USB drive and try again."
+	fi
+}

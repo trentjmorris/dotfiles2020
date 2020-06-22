@@ -1,0 +1,9 @@
+#   List installed completions
+#   ------------------------------------------------------
+list_completions() {
+	theDate=$(date +"%Y-%m-%d_%H-%M-%S-%s")
+	for command completion in ${(kv)_comps:#-*(-|-,*)}
+	do
+		printf "%-32s %s\n" $command $completion &>> ~/Desktop/comp/list_$theDate
+	done | sort
+}
