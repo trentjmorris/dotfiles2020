@@ -1,41 +1,37 @@
 # functions displaying status messages throughout installation
 
-# ask the user something ("Are you sure? [Y/n]")
+# [ ?? ] Are you sure? [Y/n]
 echo_user () {
 	printf "\r  \e[95m[  ??  ]\e[0m $1\n"
 }
 
-# item skipped ("Package X is already installed")
-echo_skip () {
-  printf "\r  \e[93m[ SKIP ]\e[90m $1\n"
+# [ STARTED ] Section Z installation
+echo_start () {
+	printf "\r  \e[32m[  STARTED  ]\e[0m $1\n"
 }
 
-# item failed ("Could not install package X")
+# [  ..  ] Copied config file from folder X -> folder Y
+echo_info () {
+printf "\r  \e[2;90m[  ..  ] $1\e[0;90m\n"
+}
+
+# [ SKIPPED ] Package Y already exists
+echo_skip () {
+  printf "\r  \e[93m[ SKIPPED ]\e[90m $1\n"
+}
+
+# [ FINISHED ] Section X installation
+echo_finish () {
+	printf "\r  \e[34m[ FINISHED ]\e[0m $1\n"
+}
+
+# [ FAILED ] Package could NOT be installed
 echo_fail () {
-  printf "\r  \e[31m[ FAIL ] $1\n"
+  printf "\r  \e[31m[ FAILED ] $1\n"
   printf ""
 }
 
-# item info ("Package X cloned from github")
-echo_info () {
-	printf "\r  \e[90m[  ..  ] $1\n"
-}
-
-# item start ("Starting homebrew install")
-echo_start () {
-	printf "\r  \e[90m[  \xf0\x9f\x95\x91 START  ] $1\n"
-}
-
-# item ok ("Install Package X and all dependencies")
-echo_ok () {
-	printf "\r  \e[32m[  OK  ]\e[90m $1\n"
-}
-
-# section done ("brew [3/4] Cask applications installed")
-echo_done () {
-	printf "\r  \e[34m[ \xE2\x9C\x93 DONE ]\e[0m $1\n"
-}
-
+# [ PLANNED EXIT ] Section X
 echo_exit () {
 	printf "\r  \e[31m[ PLANNED EXIT ] $1\n"
 	printf ""
@@ -54,4 +50,4 @@ confirm_continue() {
   fi
 }
 
-export -f echo_user echo_skip echo_fail echo_info echo_ok echo_done echo_exit confirm_continue
+export -f echo_user echo_skip echo_fail echo_info echo_info echo_finish echo_exit confirm_continue
