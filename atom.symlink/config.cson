@@ -43,6 +43,7 @@
     showIndentGuide: true
     softTabs: false
     softWrap: true
+    tabLength: 4
     tabType: "hard"
   "exception-reporting":
     userId: "81a52862-ee61-461f-96e5-3a54d62dbdab"
