@@ -1,10 +1,11 @@
 
 echo "Hello there!"
 
-echo_skip "Dotfiles dir: $DOTFILES_DIR"
+if ! [[ $(mas account) == 'trent@trentmorris.com' ]]  > /dev/null 2>&1
+then
+	echo "Not signed in"
+else
+	echo "Signed in"
+fi
 
-echo_ok "It went alright!"
-
-echo_exit
-
-sh "$HOME/.dotfiles/test3.sh"
+# sh "$HOME/.dotfiles/test3.sh"
