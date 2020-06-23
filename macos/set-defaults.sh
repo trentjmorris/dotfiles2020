@@ -24,6 +24,8 @@ if [ "$some_var" == "Model Name: Mac mini" ]; then is_mac_mini=true; fi
 #   UI
 #   ------------------------------------------------------
 
+echo_info "macOS defaults: UI"
+
 # Menu bar: hide the Time Machine, Volume, and User icons
 for domain in ~/Library/Preferences/ByHost/com.apple.systemuiserver.*; do
 	defaults write "${domain}" dontAutoLoad -array \
@@ -78,11 +80,10 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 # Set format of date & hours in menu bar
 defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM  h:mm a"
 
-echo_ok "macOS defaults: UI"
-
 #   ------------------------------------------------------
 #   Mouse, Keyboard, Trackpad
 #   ------------------------------------------------------
+echo_info "macOS defaults: Mouse, Keyboard, Trackpad"
 
 # Magic Mouse: enable right clicking
 defaults write com.apple.MultiTouchMouse MouseButtonMode TwoButton
@@ -131,14 +132,18 @@ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
 # Use scroll gesture with the Ctrl (^) modifier key to zoom
-defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
-defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144 # 10.13
+## ERROR: Could not write domain com.apple.universalaccess
+# defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
+## ERROR: Could not write domain com.apple.universalaccess
+# defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144 # 10.13
 defaults write com.apple.AppleMultiTouchTrackpad HIDScrollZoomModifierMask -int 262144 # 10.14
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad HIDScrollZoomModifierMask -int 262144 # 10.14
 # Follow the keyboard focus while zoomed in
-defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
+## ERROR: Could not write domain com.apple.universalaccess
+# defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 # Zoom should use nearest neighbor instead of smoothing.
-defaults write com.apple.universalaccess closeViewSmoothImages -bool false
+## ERROR: Could not write domain com.apple.universalaccess
+# defaults write com.apple.universalaccess closeViewSmoothImages -bool false
 
 # Disable press-and-hold for keys in favor of key repeat
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
@@ -162,11 +167,11 @@ defaults write NSGlobalDomain com.apple.trackpad.scaling -float 0.875
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
-echo_ok "macOS defaults: Mouse, Keyboard, Trackpad"
 
 #   ------------------------------------------------------
 #   Screen / Display
 #   ------------------------------------------------------
+echo_info "macOS defaults: Screen / Display"
 
 # Save screenshots to the desktop
 defaults write com.apple.screencapture location -string "${HOME}/Desktop"
@@ -180,11 +185,11 @@ defaults write com.apple.finder CreateDesktop -bool false
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool false
 
-echo_ok "macOS defaults: Screen / Display"
 
 #   ------------------------------------------------------
 #   Finder
 #   ------------------------------------------------------
+echo_info "macOS defaults: Finder"
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
@@ -253,16 +258,17 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 defaults write com.apple.finder EmptyTrashSecurely -bool true
 
 # Show the ~/Library folder
-chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
+## ERROR: "No such xattr: com.apple.FinderInfo"
+# chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
 
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes
 
-echo_ok "macOS defaults: Finder"
 
 #   ------------------------------------------------------
 #   Dock
 #   ------------------------------------------------------
+echo_info "macOS defaults: Dock"
 
 # Don't show recent applications in the dock
 defaults write com.apple.dock show-recents -bool false
@@ -299,11 +305,11 @@ defaults write com.apple.dock autohide-delay -float 0
 # Don't make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool false
 
-echo_ok "macOS defaults: Dock"
 
 #   ------------------------------------------------------
 #   Spaces, Mission Control, Launchpad
 #   ------------------------------------------------------
+echo_info "macOS defaults: Spaces, Mission Control, Launchpad"
 
 # Don’t group windows by application in Mission Control
 # (i.e. use the old Exposé behavior instead)
@@ -321,11 +327,11 @@ defaults write com.apple.dock mru-spaces -bool false
 # Add iOS Simulator to Launchpad
 sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/iOS Simulator.app"
 
-echo_ok "macOS defaults: Spaces, Mission Control, Launchpad"
 
 #   ------------------------------------------------------
 #   Energy
 #   ------------------------------------------------------
+echo_info "macOS defaults: Energy"
 
 # Enable lid wakeup
 sudo pmset -a lidwake 1
@@ -333,11 +339,11 @@ sudo pmset -a lidwake 1
 # Restart automatically on power loss
 sudo pmset -a autorestart 1
 
-echo_ok "macOS defaults: Energy"
 
 #   ------------------------------------------------------
 #   Safari, Webkit
 #   ------------------------------------------------------
+echo_info "macOS defaults: Safari, Webkit"
 
 # Privacy: don’t send search queries to Apple
 defaults write com.apple.Safari UniversalSearchEnabled -bool false
@@ -366,11 +372,11 @@ defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebK
 # Add a context menu item for showing the Web Inspector in web views
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
 
-echo_ok "macOS defaults: Safari, Webkit"
 
 #   ------------------------------------------------------
 #   iTerm
 #   ------------------------------------------------------
+echo_info "macOS defaults: iTerm"
 
 # Only use UTF-8 in Terminal.app
 defaults write com.apple.terminal StringEncodings -array 4
@@ -385,20 +391,20 @@ defaults write com.apple.Terminal ShowLineMarks -int 0
 # Don’t display the annoying prompt when quitting iTerm
 defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
-echo_ok "macOS defaults: iTerm"
 
 #   ------------------------------------------------------
 #   Time Machine
 #   ------------------------------------------------------
+echo_info "macOS defaults: Time Machine"
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
-echo_ok "macOS defaults: Time Machine"
 
 #   ------------------------------------------------------
 #   Activity Monitor
 #   ------------------------------------------------------
+echo_info "macOS defaults: Activity Monitor"
 
 # Show the main window when launching Activity Monitor
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
@@ -436,11 +442,11 @@ defaults write com.apple.ActivityMonitor NetworkGraphType -int 1
 defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0
 
-echo_ok "macOS defaults: Activity Monitor"
 
 #   ------------------------------------------------------
 #    Address Book, Dashboard, TextEdit, Disk Utility
 #   ------------------------------------------------------
+echo_info "macOS defaults: Address Book, Dashboard, TextEdit, Disk Utility"
 
 # Enable the debug menu in Address Book
 defaults write com.apple.addressbook ABShowDebugMenu -bool true
@@ -458,11 +464,11 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
 defaults write com.apple.DiskUtility advanced-image-options -bool true
 
-echo_ok "macOS defaults: Address Book, Dashboard, TextEdit, Disk Utility"
 
 #   ------------------------------------------------------
 #   App Store
 #   ------------------------------------------------------
+echo_info "macOS defaults: App Store"
 
 # Enable the WebKit Developer Tools in the Mac App Store
 defaults write com.apple.appstore WebKitDeveloperExtras -bool true
@@ -485,7 +491,6 @@ defaults write com.apple.SoftwareUpdate ConfigDataInstall -int 1
 # Turn on app auto-update
 defaults write com.apple.commerce AutoUpdate -bool true
 
-echo_ok "macOS defaults: App Store"
 
 #   ------------------------------------------------------
 #   Photos
@@ -494,20 +499,21 @@ echo_ok "macOS defaults: App Store"
 # Prevent Photos from opening automatically when devices are plugged in
 defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
 
-echo_ok "macOS defaults: Photos"
+echo_info "macOS defaults: Photos"
 
 #   ------------------------------------------------------
 #   Messages
 #   ------------------------------------------------------
+echo_info "macOS defaults: Messages"
 
 # Disable smart quotes as it’s annoying for messages that contain code
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
-echo_ok "macOS defaults: Messages"
 
 #   ------------------------------------------------------
 #   Transmission
 #   ------------------------------------------------------
+echo_info "macOS defaults: Transmission"
 
 # Don't store incomplete downloads in a seperate folder
 defaults write org.m0k.transmission UseIncompleteDownloadFolder -bool false
@@ -536,7 +542,6 @@ defaults write org.m0k.transmission BlocklistAutoUpdate -bool true
 # Randomize port on launch
 defaults write org.m0k.transmission RandomPort -bool true
 
-echo_ok "macOS defaults: Transmission"
 
 #   ------------------------------------------------------
 #   Kill affected applications (except Terminal)
@@ -551,5 +556,5 @@ done
 
 sleep 1
 
-echo_done "macOS defaults"
+echo_finish "macOS defaults"
 echo_info "Note: Some changes may only take effect after restarting the computer"
