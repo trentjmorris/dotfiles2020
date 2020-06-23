@@ -16,22 +16,23 @@ cd "$(dirname "$0")"
 #   ------------------------------------------------------
 #   XCODE
 #   ------------------------------------------------------
-echo_start "Xcode"
 
 if ! xcode-select --print-path &> /dev/null; then
+	echo_start "Xcode"
 	# Prompt user to install the XCode Command Line Tools
 	xcode-select --install &> /dev/null
 	# Wait until the XCode Command Line Tools are installed
 	until xcode-select --print-path &> /dev/null; do
 		sleep 5
 	done
-  echo_ok 'Installed Xcode Command Line Tools'
+	echo_info 'Installed Xcode Command Line Tools'
 
 	# Prompt user to agree to the terms of the Xcode license
 	# https://github.com/alrra/dotfiles/issues/10
-  echo_user 'Please accept the License Agreement'
+	echo_user 'Please accept the License Agreement'
 	sudo xcodebuild -license
-  echo_ok 'Xcode license has been accepted'
+	echo_info 'Xcode license has been accepted'
+	echo_finish "Xcode"
 else
 	echo_skip "Xcode Command Line Tools have already been installed"
 fi
@@ -41,50 +42,46 @@ fi
 # https://github.com/alrra/dotfiles/issues/13
 if [ -e /Applications/Xcode.app ]; then
 	sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
-	echo_ok 'Ensured "xcode-select" developer directory points  Xcode'
+	echo_info 'Ensured "xcode-select" developer directory points to Xcode'
+else
+	echo_skip '"xcode-select" developer directory already points to Xcode'
 fi
 
-echo_done "Xcode"
-echo_exit "Xcode"
 
 
-echo "\n----------\n'echo_exit' DID NOT EXIT BEFORE THIS FIRED!!!!!!!!!\n----------\n"
-exit 1
-echo "\n----------\nEVEN A MANUAL 'exit 1' DID NOT EXIT BEFORE THIS FIRED!!!!!!!!!\n----------\n"
+
+
 
 #   ------------------------------------------------------
 #   GITCONFIG
 #   ------------------------------------------------------
-echo_start "Gitconfig"
-
 setup_gitconfig () {
-  if ! [ -f '$DOTFILES_DIR/git/gitconfig.local.symlink' ]
-  then
-    echo_info 'setup gitconfig'
+	if ! [ -f git/gitconfig.local.symlink ]
+	then
+		echo_start "Gitconfig"
+		echo_info 'setup gitconfig'
 
-    git_credential='cache'
-    if [ "$(uname -s)" == "Darwin" ]
-    then
-      git_credential='osxkeychain'
-    fi
+		git_credential='cache'
+		if [ "$(uname -s)" == "Darwin" ]
+		then
+			git_credential='osxkeychain'
+		fi
 
-    echo_user ' - What is your github author name?'
-    read -e git_authorname
-    echo_user ' - What is your github author email?'
-    read -e git_authoremail
+		echo_user ' - What is your github author name?'
+		read -e git_authorname
+		echo_user ' - What is your github author email?'
+		read -e git_authoremail
 
-    sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" git/gitconfig.local.symlink.example > git/gitconfig.local.symlink
+		sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" git/gitconfig.local.symlink.example > git/gitconfig.local.symlink
 
-    echo_ok 'gitconfig.local created'
+		echo_info 'Local gitconfig credentials file created'
+		echo_finish "Gitconfig"
 	else
-		echo_skip "gitconfig.local already created"
-  fi
+		echo_skip "Local gitconfig credentials file already exists"
+	fi
 }
 
 setup_gitconfig
-
-echo_done "Gitconfig"
-echo_exit "Gitconfig"
 
 
 
@@ -93,124 +90,132 @@ echo_exit "Gitconfig"
 #   ------------------------------------------------------
 #   HOMEBREW INSTALL
 #   ------------------------------------------------------
-echo_start "Homebrew Install"
 
-if test ! $(which brew > /dev/null 2>&1)
+if test ! $(which brew)
 then
-  echo_info "Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	echo_start "Homebrew Install"
+	echo_info "Installing Homebrew"
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	brew tap Homebrew/bundle
-	echo_ok "Homebrew installed"
+	echo_info "Homebrew installed"
+	echo_finish "Homebrew Install"
 else
-  echo_skip "Homebrew already installed"
+	echo_skip "Homebrew already installed"
 fi
 
-echo_info "Updating Homebrew"
+echo_start "Updating Homebrew"
 brew update > /dev/null 2>&1
 brew upgrade > /dev/null 2>&1
-echo_ok "Homebrew Updated"
+echo_finish "Homebrew Updated"
 
-echo_done "Homebrew Install"
-echo_exit "Homebrew Install"
+
 
 
 
 #   ------------------------------------------------------
 #   SYMLINKS
 #   ------------------------------------------------------
-echo_start "Symlinks"
-
 link_file () {
-  local src=$1 dst=$2
+	local src=$1 dst=$2
 
-  local overwrite= backup= skip=
-  local action=
+	local src_truncated=
+	local dst_truncated=
 
-  if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
-  then
+	REGEX_STR="[^\/]+\/[^\/]+$"
+	if [[ "$src" =~ $REGEX_STR ]]; then
+		src_truncated=${BASH_REMATCH[0]}
+	fi
+	if [[ "$dst" =~ $REGEX_STR ]]; then
+		dst_truncated=${BASH_REMATCH[0]}
+	fi
 
-    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
-    then
+	local overwrite= backup= skip=
+	local action=
 
-      local currentSrc="$(readlink $dst)"
+	if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
+	then
 
-      if [ "$currentSrc" == "$src" ]
-      then
+		if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
+		then
 
-        skip=true;
+			local currentSrc="$(readlink $dst)"
 
-      else
+			if [ "$currentSrc" == "$src" ]
+			then
 
-        echo_user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
-        [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
+				skip=true;
 
-        case "$action" in
-          o )
-            overwrite=true;;
-          O )
-            overwrite_all=true;;
-          b )
-            backup=true;;
-          B )
-            backup_all=true;;
-          s )
-            skip=true;;
-          S )
-            skip_all=true;;
-          * )
-            ;;
-        esac
+			else
 
-      fi
+				echo_user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+				[s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+				read -n 1 action
 
-    fi
+				case "$action" in
+					o )
+					overwrite=true;;
+					O )
+					overwrite_all=true;;
+					b )
+					backup=true;;
+					B )
+					backup_all=true;;
+					s )
+					skip=true;;
+					S )
+					skip_all=true;;
+					* )
+					;;
+				esac
 
-    overwrite=${overwrite:-$overwrite_all}
-    backup=${backup:-$backup_all}
-    skip=${skip:-$skip_all}
+			fi
 
-    if [ "$overwrite" == "true" ]
-    then
-      rm -rf "$dst"
-      echo_ok "removed $dst"
-    fi
+		fi
 
-    if [ "$backup" == "true" ]
-    then
-      mv "$dst" "${dst}.backup"
-      echo_info "moved $dst to ${dst}.backup"
-    fi
+		overwrite=${overwrite:-$overwrite_all}
+		backup=${backup:-$backup_all}
+		skip=${skip:-$skip_all}
 
-    if [ "$skip" == "true" ]
-    then
-      echo_skip "skipped $src"
-    fi
-  fi
+		if [ "$overwrite" == "true" ]
+		then
+			rm -rf "$dst"
+			echo_info "removed $dst_truncated"
+		fi
 
-  if [ "$skip" != "true" ]  # "false" or empty
-  then
-    ln -s "$1" "$2"
-    echo_ok "linked $1 to $2"
-  fi
+		if [ "$backup" == "true" ]
+		then
+			mv "$dst" "${dst}.backup"
+			echo_info "moved $dst_truncated to ${dst_truncated}.backup"
+		fi
+
+		if [ "$skip" == "true" ]
+		then
+			echo_skip "skipped $src_truncated"
+		fi
+	fi
+
+	if [ "$skip" != "true" ]  # "false" or empty
+	then
+		ln -s "$1" "$2" > /dev/null 2>&1
+		echo_info "linked $src_truncated to $dst_truncated"
+	fi
 }
 
 install_dotfiles () {
-  echo_info 'installing dotfiles'
+	echo_info 'installing dotfiles'
 
-  local overwrite_all=false backup_all=false skip_all=false
+	local overwrite_all=false backup_all=false skip_all=false
 
-  for src in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*')
-  do
-    dst="$HOME/.$(basename "${src%.*}")"
-    link_file "$src" "$dst"
-  done
+	for src in $(find -H "$DOTFILES_DIR" -maxdepth 2 -name '*.symlink' -not -path '*.git*')
+	do
+		dst="$HOME/.$(basename "${src%.*}")"
+		link_file "$src" "$dst"
+	done
 }
 
+echo_start "Symlinks"
 install_dotfiles
-
-echo_done "Symlinks"
-echo_exit "Symlinks"
+echo_finish "Symlinks"
 
 
 
@@ -221,23 +226,34 @@ echo_exit "Symlinks"
 #   ------------------------------------------------------
 echo_start "Clone Repos"
 function clone_if_needed() {
-  src="$1"
-  dest="$2"
-  dest_base="$LIB_DIR/$(basename "$2")"
+	src="$1"
+	dst="$2"
+	dst_base="$LIB_DIR/$(basename "$2")"
 
-  if [ ! -e $dest ]; then
-    git clone "$src" $dest > /dev/null 2>&1
-    echo_ok "Repo cloned into '$dest_base'"
-  else
-    echo_skip "'$dest_base' already exists"
-  fi
+	local src_truncated=
+	local dst_truncated=
+
+	REGEX_STR="[^\/]+\/[^\/]+$"
+	if [[ "$src" =~ $REGEX_STR ]]; then
+		src_truncated=${BASH_REMATCH[0]}
+	fi
+	if [[ "$dst" =~ $REGEX_STR ]]; then
+		dst_truncated=${BASH_REMATCH[0]}
+	fi
+
+	if [ ! -e $dst ]; then
+		git clone "$src" $dst > /dev/null 2>&1
+		echo_info "Repo cloned into '$dst_truncated'"
+	else
+		echo_skip "'$dst_truncated' already exists"
+	fi
 }
 
 if [ ! -e $LIB_DIR ]; then
-  mkdir $LIB_DIR
-  echo_ok "Repo directory created: $LIB_DIR"
+	mkdir $LIB_DIR
+	echo_info "Repo directory created: $LIB_DIR"
 else
-  echo_skip "Repo directory already exists: $LIB_DIR"
+	echo_skip "Repo directory already exists: $LIB_DIR"
 fi
 # alias-tips
 clone_if_needed https://github.com/djui/alias-tips.git $LIB_DIR/alias-tips
@@ -267,8 +283,7 @@ link_file "$LIB_DIR/ayu-vim/term/ayu-mirage.itermcolors" "$DOTFILES_DIR/iterm"
 clone_if_needed https://github.com/arcticicestudio/nord-iterm2.git $LIB_DIR/nord-iterm2
 link_file "$LIB_DIR/nord-iterm2/src/xml/Nord.itermcolors" "$DOTFILES_DIR/iterm"
 
-echo_done "Clone Repos"
-echo_exit "Clone Repos"
+echo_finish "Clone Repos"
 
 
 
@@ -283,8 +298,7 @@ brew tap Homebrew/bundle
 echo_info "installing packages/casks from Brewfile"
 brew bundle
 
-echo_done "Brewfile"
-echo_exit "Brewfile"
+echo_finish "Brewfile"
 
 
 
@@ -293,16 +307,16 @@ echo_exit "Brewfile"
 #   ------------------------------------------------------
 #   SET ZSH
 #   ------------------------------------------------------
-echo_start "Setup ZSH"
 
 # add ZSH to list of accepted shells
 if grep -Fxq "/usr/local/bin/zsh" /etc/shells > /dev/null 2>&1; then
 	echo_skip "ZSH is already in the list of accepted shells"
 else
+	echo_start "Setup ZSH"
 	# If not found
 	sudo sh -c 'echo "/usr/local/bin/zsh" >> /etc/shells'
 	if grep -Fxq "/usr/local/bin/zsh" /etc/shells > /dev/null 2>&1; then
-		echo_ok "ZSH added to list of accepted shells"
+		echo_info "ZSH added to list of accepted shells"
 	else
 		echo_fail "ZSH could not be added to list of accepted shells."
 	fi
@@ -311,7 +325,7 @@ fi
 # set ZSH as the default shell
 if echo $SHELL | grep /bin/bash > /dev/null 2>&1; then
 	chsh -s $(which zsh)
-	echo_ok "ZSH is now the default shell"
+	echo_info "ZSH is now the default shell"
 else
 	echo_skip "ZSH is already the default shell"
 fi
@@ -320,8 +334,7 @@ fi
 ln -sf "$LIB_DIR/pure/pure.zsh" /usr/local/share/zsh/site-functions/prompt_pure_setup
 ln -sf "$LIB_DIR/pure/async.zsh" /usr/local/share/zsh/site-functions/async
 
-echo_done "Setup ZSH"
-echo_exit "Setup ZSH"
+echo_finish "Setup ZSH"
 
 
 
@@ -335,63 +348,65 @@ echo_start "App Store apps"
 echo_info "Running macOS software update"
 sudo softwareupdate -i -a
 
-echo_user "Please sign in to the App Store with your Apple ID to continue installations..\n Press any key to continue, or [Ctrl+C] to abort."
+if ! [[ $(mas account) == 'trent@trentmorris.com' ]]  > /dev/null 2>&1
+then
+	echo_user "Please sign in to the App Store with your Apple ID to continue installations..\n Press any key to continue, or [Ctrl+C] to abort."
 
-# open App Store
-open -a "App Store"
+	# open App Store
+	open -a "App Store"
 
-read -n 1 action
+	read -n 1 action
+fi
+
 
 # close App Store
 osascript -e 'quit app "App Store"'
 
 # Install mac applications
 function mas_install () {
-  app_name="$1"
-  app_id="$2"
+	app_name="$1"
+	app_id="$2"
 
-  if mas list | grep $app_id > /dev/null 2>&1; then
-    echo_skip "$app_name is already installed"
-  else
-    if mas install $app_id > /dev/null 2>&1; then
-      echo_ok "$app_name has been installed"
-    else
-      echo_fail "$app_name could not be installed"
-    fi
-  fi
+	if mas list | grep $app_id > /dev/null 2>&1; then
+		echo_skip "$app_name is already installed"
+	else
+		if mas install $app_id > /dev/null 2>&1; then
+			echo_info "$app_name has been installed"
+		else
+			echo_fail "$app_name could not be installed"
+		fi
+	fi
 }
 
 sleep 1
 
 if [[ $(mas account) == 'trent@trentmorris.com' ]]  > /dev/null 2>&1;
 then
-  echo_info "Installing App Store applications"
-  mas_install "Affinity Designer" 824171161
-  mas_install "Amphetamine" 937984704
-  mas_install "Bear" 1091189122
-  mas_install "Deliveries" 924726344
-  mas_install "Good Notes" 1444383602
-  mas_install "Magnet" 441258766
-  mas_install "Pages" 409201541
-  mas_install "Noto" 1459055246
-  mas_install "Numbers" 409203825
-  mas_install "Snippets Lab" 1006087419
-  mas_install "Spark" 1176895641
-  mas_install "Things" 904280696
-  mas_install "Twitter" 409789998
-  echo_ok "App Store apps have been installed"
+	echo_info "Installing App Store applications"
+	mas_install "Affinity Designer" 824171161
+	mas_install "Amphetamine" 937984704
+	mas_install "Bear" 1091189122
+	mas_install "Deliveries" 924726344
+	mas_install "Good Notes" 1444383602
+	mas_install "Magnet" 441258766
+	mas_install "Pages" 409201541
+	mas_install "Noto" 1459055246
+	mas_install "Numbers" 409203825
+	mas_install "Snippets Lab" 1006087419
+	mas_install "Spark" 1176895641
+	mas_install "Things" 904280696
+	mas_install "Twitter" 409789998
 else
-  echo_fail "Cannot install AppStore apps. It's possible you're not signed into your account\n\
-    Please sign in by running:  \e[94m mas signin <your_email_address> \e[0m \n\
-  Then run this script again:  \e[94m sh $DOTFILES_DIR/macos/appstore.sh \e[0m\n"
+	echo_fail "Cannot install AppStore apps. It's possible you're not signed into your account\n\
+	Please sign in by running:  \e[94m mas signin <your_email_address> \e[0m \n\
+	Then run this script again:  \e[94m sh $DOTFILES_DIR/macos/appstore.sh \e[0m\n"
 fi
 
 # 1Password
 sudo xattr -r -d com.apple.quarantine "/Applications/1Password 7.app"
-echo_ok "Removed 1Password from macOS quarantine"
+echo_info "Removed 1Password from macOS quarantine"
 
-echo_done "App Store apps"
-echo_exit "App Store apps"
+echo_finish "App Store apps"
 
 
 
@@ -400,31 +415,33 @@ echo_exit "App Store apps"
 #   ------------------------------------------------------
 #   NPM
 #   ------------------------------------------------------
-echo_start "NPM"
 
 function npm_install () {
-  if npm list --global | grep "$1" > /dev/null 2>&1; then
-    echo_skip "'$1' is already installed"
-  else
-    npm install -g "$1" --quiet > /dev/null 2>&1
-    if npm list --global | grep "$1" > /dev/null 2>&1; then
-      echo_ok "'$1' has been installed"
-    else
-      echo_fail "'$1' could not be installed"
-    fi
-  fi
+	if npm list --global | grep "$1" > /dev/null 2>&1; then
+		echo_skip "'$1' is already installed"
+	else
+		npm install -g "$1" --quiet > /dev/null 2>&1
+		if npm list --global | grep "$1" > /dev/null 2>&1; then
+			echo_info "'$1' has been installed"
+		else
+			echo_fail "'$1' could not be installed"
+		fi
+	fi
 }
 
 if test $(which npm)
 then
-  npm_install gulp # automate dev tasks
-  npm_install nodemon # monitor for changes and restart server
-  npm_install prettier # code formatter (js, css, markdown, html, less, scss, etc.)
-  npm_install write-good # prose linter (markdown, text, etc.)
+	echo_start "NPM package installs"
+	npm_install gulp # automate dev tasks
+	npm_install nodemon # monitor for changes and restart server
+	npm_install prettier # code formatter (js, css, markdown, html, less, scss, etc.)
+	npm_install write-good # prose linter (markdown, text, etc.)
+	echo_finish "NPM package installs"
+else
+	echo_fail "Could not install NPM packages. NPM could not be found."
 fi
 
-echo_done "NPM"
-echo_exit "NPM"
+echo_finish "NPM"
 
 
 
@@ -437,8 +454,7 @@ echo_start "macOS Defaults"
 
 $DOTFILES_DIR/macos/set-defaults.sh
 
-echo_done "macOS Defaults"
-echo_exit "macOS Defaults"
+echo_finish "macOS Defaults"
 
 
 
@@ -454,12 +470,12 @@ echo_start "Copy/Symlink app prefs"
 #   --------------------------------------
 AI_DIR=$HOME/Library/Preferences/Adobe\ Photoshop\ CS6\ Settings
 if [ -f "$AI_DIR" ]; then
-  link_file "$DOTFILES_DIR/adobe/ai/Workspaces/MBA Workspace" "$AI_DIR/Workspaces/MBA Workspace"
-  link_file "$DOTFILES_DIR/adobe/ai/Workspaces/Trent's Rad Workspace" "$AI_DIR/Workspaces/Trent's Rad Workspace"
-  link_file "$DOTFILES_DIR/adobe/ai/Workspaces/Two-Monitor Workspace" "$AI_DIR/Workspaces/Two-Monitor Workspace"
-  link_file "$DOTFILES_DIR/adobe/ai/Adobe Illustrator Prefs" "$AI_DIR/Adobe Illustrator Prefs"
+	link_file "$DOTFILES_DIR/adobe/ai/Workspaces/MBA Workspace" "$AI_DIR/Workspaces/MBA Workspace"
+	link_file "$DOTFILES_DIR/adobe/ai/Workspaces/Trent's Rad Workspace" "$AI_DIR/Workspaces/Trent's Rad Workspace"
+	link_file "$DOTFILES_DIR/adobe/ai/Workspaces/Two-Monitor Workspace" "$AI_DIR/Workspaces/Two-Monitor Workspace"
+	link_file "$DOTFILES_DIR/adobe/ai/Adobe Illustrator Prefs" "$AI_DIR/Adobe Illustrator Prefs"
 else
-  echo_fail "Illustrator not installed, cannot symlink preferences."
+	echo_fail "Illustrator not installed, cannot symlink preferences."
 fi
 
 
@@ -467,13 +483,13 @@ fi
 #   --------------------------------------
 PS_DIR=$HOME/Library/Preferences/Adobe\ Photoshop\ CS6\ Settings
 if [ -f "$PS_DIR" ]; then
-  link_file "$DOTFILES_DIR/adobe/ps/Workspaces/Trent's Ultra Workspace" "$PS_DIR/Workshops"
-  link_file "$DOTFILES_DIR/adobe/ps/Actions Palette.psp" "$PS_DIR/Actions Palette.psp"
-  link_file "$DOTFILES_DIR/adobe/ps/Adobe Photoshop CS6 Prefs" "$PS_DIR/Adobe Photoshop CS6 Prefs"
-  link_file "$DOTFILES_DIR/adobe/ps/Keyboard Shortcuts Primary" "$PS_DIR/Keyboard Shortcuts Primary"
-  link_file "$DOTFILES_DIR/adobe/ps/Keyboard Shortcuts" "$PS_DIR/Keyboard Shortcuts"
+	link_file "$DOTFILES_DIR/adobe/ps/Workspaces/Trent's Ultra Workspace" "$PS_DIR/Workshops"
+	link_file "$DOTFILES_DIR/adobe/ps/Actions Palette.psp" "$PS_DIR/Actions Palette.psp"
+	link_file "$DOTFILES_DIR/adobe/ps/Adobe Photoshop CS6 Prefs" "$PS_DIR/Adobe Photoshop CS6 Prefs"
+	link_file "$DOTFILES_DIR/adobe/ps/Keyboard Shortcuts Primary" "$PS_DIR/Keyboard Shortcuts Primary"
+	link_file "$DOTFILES_DIR/adobe/ps/Keyboard Shortcuts" "$PS_DIR/Keyboard Shortcuts"
 else
-  echo_fail "Photoshop not installed, cannot symlink preferences."
+	echo_fail "Photoshop not installed, cannot symlink preferences."
 fi
 
 
@@ -482,11 +498,11 @@ fi
 src="$DOTFILES_DIR/amphetamine/com.if.Amphetamine.plist"
 dest="$HOME/Library/Containers/com.if.Amphetamine/Data/Library/Preferences/com.if.Amphetamine.plist"
 if [ -e $dest ]; then
-  mv "$dest" "$dest.backup" > /dev/null 2>&1
-  echo_info "Existing Amphetamine preferences backed up to '$(basename "$dest").backup'."
+	mv "$dest" "$dest.backup" > /dev/null 2>&1
+	echo_info "Existing Amphetamine preferences backed up to '$(basename "$dest").backup'."
 fi
 cp -iv $src $dest > /dev/null 2>&1
-echo_ok "Amphetamine preferences copied."
+echo_info "Amphetamine preferences copied."
 unset src dest
 
 
@@ -494,9 +510,9 @@ unset src dest
 #   --------------------------------------
 if [ ! -e $HOME/Coding ]; then
 	mkdir $HOME/Coding
-  echo_ok "Created ~/Coding directory"
+	echo_info "Created ~/Coding directory"
 else
-  echo_skip "Directory ~/Coding already exists"
+	echo_skip "Directory ~/Coding already exists"
 fi
 
 
@@ -512,13 +528,13 @@ XCODE_DIR="$HOME/Library/Developer/Xcode/UserData"
 
 # Snippets
 if ! [ -e "$XCODE_DIR/CodeSnippets" ]; then
-   mkdir "$XCODE_DIR/CodeSnippets"
+	mkdir "$XCODE_DIR/CodeSnippets"
 fi
-cp -v "$DOTFILES_DIR/xcode/trents-snippets.codesnippets" "$XCODE_DIR/CodeSnippets/trents-snippets.codesnippets"
+cp -v "$DOTFILES_DIR/xcode/trents-snippets.codesnippets" "$XCODE_DIR/CodeSnippets/trents-snippets.codesnippets" > /dev/null 2>&1
 
 ### Themes
 if ! [ -e "$XCODE_DIR/FontAndColorThemes" ]; then
-   mkdir "$XCODE_DIR/FontAndColorThemes"
+	mkdir "$XCODE_DIR/FontAndColorThemes"
 fi
 # One Dark
 ln -s "$LIB_DIR/xcode-one-dark/One Dark.xccolortheme" "$XCODE_DIR/FontAndColorThemes"
@@ -527,19 +543,13 @@ ln -s "$LIB_DIR/xcode-dracula/Dracula.xccolortheme" "$XCODE_DIR/FontAndColorThem
 
 # Key Bindings
 if ! [ -e "$XCODE_DIR/Keybindings" ]; then
-   mkdir "$XCODE_DIR/KeyBindings"
+	mkdir "$XCODE_DIR/KeyBindings"
 fi
-cp -v "$DOTFILES_DIR/xcode/trents-bindings" "$XCODE_DIR/KeyBindings/trents-bindings"
+cp -v "$DOTFILES_DIR/xcode/trents-bindings" "$XCODE_DIR/KeyBindings/trents-bindings" > /dev/null 2>&1
 sudo cp "$DOTFILES_DIR/xcode/IDETextKeyBindingSet.plist" "/Applications/Xcode.app/Contents/Frameworks/IDEKit.framework/Versions/A/Resources/IDETextKeyBindingSet.plist"
 
-echo_done "Copy/Symlink app prefs"
+echo_finish "Copy/Symlink app prefs"
 
 
 
-
-
-echo ""
-echo_done
-echo_done "---- DOTFILES INSTALL COMPLETE ----"
-echo_done
-echo ""
+echo_finish "---- DOTFILES INSTALL COMPLETE ----"
