@@ -5,16 +5,16 @@ brew 'exa'           # colorful version of ls
 brew 'exiftool'      # manage photo EXIF metadata
 brew 'httpie'        # command line HTTP client
 brew 'imagemagick'   # create, edit, compose, or convert bitmap images
-brew 'dockutil'      # manage dock apps from command-line
+# brew 'dockutil'      # manage dock apps from command-line
 brew 'ffmpeg'        # play, record, convert, and stream audio and video
 brew 'git'           # the most widely used version control system
 brew 'git-flow-avh'  # AVH version of git-flow
-brew 'grip'          # gihub flavored Markdown
+# brew 'grip'          # gihub flavored Markdown
 brew 'fzf'           # a fuzzy command-line finder
 brew 'mas'           # Mac App Store command line interface
 brew 'openssl'       # TLS/SSL and crypto library
 brew 'node'          # also installs `npm` using the recommended method
-# brew 'python3'       # newer python than macOS comes with
+brew 'python3'       # newer python than macOS comes with
 brew 'rsync'         # a fast remote (and local) file-copying tool
 brew 'scmpuff'       # reference git files using numbers (git add 1-3)
 brew 'speedtest-cli' # command line speed test
@@ -31,7 +31,6 @@ brew 'zsh'           # mirror of the Z shell source code repository
 brew 'swiftlint'     # a tool to enforce Swift style and conventions (requires xcode)
 brew 'swiftformat'   # command-line tool and Xcode Extension for formatting Swift code
 
-brew 'caskroom/cask/brew-cask'
 cask '1password'
 cask 'alfred'
 cask 'atom'
