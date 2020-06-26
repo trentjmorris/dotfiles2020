@@ -90,6 +90,11 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 # Set format of date & hours in menu bar
 defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM  h:mm a"
 
+# Click the scroll bar to ->
+#     0 - Jump to the next page
+#     1 - Jump to the spot that's clicked
+defaults write "Apple Global Domain" AppleScrollerPagingBehavior -int 1
+
 #   ------------------------------------------------------
 #   Mouse, Keyboard, Trackpad
 #   ------------------------------------------------------
