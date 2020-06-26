@@ -48,6 +48,9 @@ fi
 defaults write com.apple.TextInputMenu visible -int 0
 defaults write com.apple.TextInputMenuAgent "NSStatusItem Visible Item-0" -int 0
 
+# Don't show Siri in menu bar
+defaults write com.apple.Siri StatusMenuVisible -int 0
+
 # Set sidebar icon size to small
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
 
