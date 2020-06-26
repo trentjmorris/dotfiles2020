@@ -46,6 +46,7 @@ fi
 
 # Don't show Input Source language icon in menu bar
 defaults write com.apple.TextInputMenu visible -int 0
+defaults write com.apple.TextInputMenuAgent "NSStatusItem Visible Item-0" -int 0
 
 # Set sidebar icon size to small
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
