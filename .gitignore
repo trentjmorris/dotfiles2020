@@ -1,3 +1,13 @@
+# atom
+/atom.symlink/*
+!/atom.symlink/config.cson
+!/atom.symlink/init.coffee
+!/atom.symlink/install.sh
+!/atom.symlink/keymap.cson
+!/atom.symlink/packages.txt
+!/atom.symlink/snippets.cson
+!/atom.symlink/styles.less
+
 # vim
 /vim.symlink/*
 !/vim.symlink/config
